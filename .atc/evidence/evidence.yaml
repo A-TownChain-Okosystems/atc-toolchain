@@ -33,3 +33,26 @@ test_run:
   timestamp: 2026-10-05T22:11:04Z
   result: PASS
   runner: github-actions
+
+# ── Statusvokabular-Bindung (Owner, 06.10.): IMPLEMENTED / EXECUTION PENDING / VERIFIED ──
+# IMPLEMENTED != VERIFIED · EXECUTION PENDING = beschlossen, nicht begonnen.
+# Additive Bindung; SCR-0080-Dimensionen oberhalb bleiben unveraendert (org-weites Schema).
+status_bindung:
+  governance_grundausstattung:
+    status: VERIFIED
+    evidence: "atc-repo-audit GATE PASS 100/100 (R1 COMPLIANT, EXCELLENT) — live verifiziert 05.10."
+  smoke_test_suite:
+    status: VERIFIED
+    evidence: "smoke-tests.yml Run 37380786776, commit 39f7b55, PASS (s. test_run)"
+  rust_foundation_ankerbaum:
+    status: IMPLEMENTED
+    evidence: "Commits 09a00330/ad514218/abe17cc5 auf Branch anchor/compiler-baseline (PRESERVATION-ANKER, NICHT auf main); CI dort rot (rustfmt, README-Purpose) — NICHT VERIFIED"
+  rust_foundation_integration_main:
+    status: EXECUTION PENDING
+    evidence: "gebunden an Sequenz: ATCB-Freeze (erledigt: ee265313 in atclang) -> Spec-Konsolidierung -> Gate 0"
+  cli_kern_atc_tc:
+    status: EXECUTION PENDING
+    evidence: "kein Code auf main; Toolchain-Schritt 1 wartet auf Gate 0"
+  atcb_v1_norm:
+    status: IMPLEMENTED
+    evidence: "Freeze-Commit ee265313 in atclang (ATC-BC-001 v1.0.0-FROZEN); Referenzimplementierung dort vorbelastet CI-rot — NICHT VERIFIED bis Gate 0"
