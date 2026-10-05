@@ -38,12 +38,20 @@ test_run:
 # IMPLEMENTED != VERIFIED · EXECUTION PENDING = beschlossen, nicht begonnen.
 # Additive Bindung; SCR-0080-Dimensionen oberhalb bleiben unveraendert (org-weites Schema).
 status_bindung:
+  NORMATIV_REF: "SCR-PENDING (atc-standards)"
+  SCOPE: "local atc-toolchain convention until SCR resolves"
+  VERIFIED_SCOPE: [governance, smoke-suite]
+  VERIFIED_SHA: "2f379395c48be303a33dffd1c05fbf511d489ab5"
+  VERIFIED_RUN:
+    governance: 37390728473
+    smoke_suite: 37390728544
+  VERIFIED_GRENZE: "VERIFIED bezieht sich ausschliesslich auf Workflow-Konformitaet bzw. Smoke-Suite-Umfang auf VERIFIED_SHA — keine Aussage ueber Code-Korrektheit"
   governance_grundausstattung:
     status: VERIFIED
-    evidence: "atc-repo-audit GATE PASS 100/100 (R1 COMPLIANT, EXCELLENT) — live verifiziert 05.10."
+    evidence: "atc-repo-audit GATE PASS 100/100 (R1 COMPLIANT, EXCELLENT) — verifiziert GOVERNANCE-KONFORMITAET von 2f379395 (Run 37390728473), nicht Code-Korrektheit"
   smoke_test_suite:
     status: VERIFIED
-    evidence: "smoke-tests.yml Run 37380786776, commit 39f7b55, PASS (s. test_run)"
+    evidence: "smoke-tests.yml auf 2f379395 gruen (Run 37390728544; Ursprungslauf 37380786776 lief auf 39f7b55, s. test_run). Aussagekraft endet am Suite-Umfang (5 Metadaten-Tests)"
   rust_foundation_ankerbaum:
     status: IMPLEMENTED
     evidence: "Commits 09a00330/ad514218/abe17cc5 auf Branch anchor/compiler-baseline (PRESERVATION-ANKER, NICHT auf main); CI dort rot (rustfmt, README-Purpose) — NICHT VERIFIED"
