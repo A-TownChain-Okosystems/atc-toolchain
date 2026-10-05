@@ -5,15 +5,15 @@ schema_version: "1.0.0"
 repository: atc-toolchain
 generated: "2026-10-05"
 generated_by: "Aurora Superagent (Owner-Order: Repo-Erstellung)"
-bound_commit: 97387c13c4c4aecb23ed33f99f03b36ffbd58975
+bound_commit: 39f7b55ff1a99e2f42357c7650b6ebf806700c78
 maturity_class: C
 r_level: R1
 implementation:
   status: skeleton
   summary: "R1-Skelett: Governance-Grundausstattung; Werkzeug-Implementierung (CLI/Build/Audit-Runner) folgt"
 tests:
-  status: not_run
-  evidence: "Kein testbarer Werkzeugbestand im Skelett (ehrlich: not_run)"
+  status: pass_with_evidence
+  evidence: "Governance-Smoke-Test (tests/test_governance_smoke.py, unittest, 5 Tests) — lokal + CI (smoke-tests.yml Run 37380786776, commit 39f7b55, PASS). Nur Metadaten-Smoke, KEIN Werkzeug-Implementierungs-Claim (CLI/Build/Audit-Runner folgt)."
 security:
   status: not_audited
 conformance:
@@ -26,3 +26,10 @@ milestone_claims:
 canonical_role:
   capability: developer_toolchain
   canonical: true
+test_run:
+  workflow: Smoke Tests (unittest)
+  run_id: 37380786776
+  commit: 39f7b55ff1a99e2f42357c7650b6ebf806700c78
+  timestamp: 2026-10-05T22:11:04Z
+  result: PASS
+  runner: github-actions
