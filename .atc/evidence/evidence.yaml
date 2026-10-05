@@ -1,0 +1,28 @@
+# ATC Evidence SSOT — maschinenlesbar und EHRLICH (SCR-0080-Regelwerk)
+# Statusleiter: SPECIFIED -> IMPLEMENTED -> TESTED -> VERIFIED -> AUDITED -> RELEASED
+# CLAIMED != PASS · DOCUMENTED != IMPLEMENTED · IMPLEMENTED != VERIFIED
+schema_version: "1.0.0"
+repository: atc-toolchain
+generated: "2026-10-05"
+generated_by: "Aurora Superagent (Owner-Order: Repo-Erstellung)"
+bound_commit: 97387c13c4c4aecb23ed33f99f03b36ffbd58975
+maturity_class: C
+r_level: R1
+implementation:
+  status: skeleton
+  summary: "R1-Skelett: Governance-Grundausstattung; Werkzeug-Implementierung (CLI/Build/Audit-Runner) folgt"
+tests:
+  status: not_run
+  evidence: "Kein testbarer Werkzeugbestand im Skelett (ehrlich: not_run)"
+security:
+  status: not_audited
+conformance:
+  status: not_verified
+release:
+  status: development
+milestone_claims:
+  rule: "M-Claims nur mit Evidence-Bundle (ATC-STD-MILESTONE-001)"
+  latest_verified: null
+canonical_role:
+  capability: developer_toolchain
+  canonical: true
