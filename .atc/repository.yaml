@@ -10,7 +10,8 @@ project:
   domain: developer_tools
   component: toolchain
 language:
-  primary: python
+  primary: rust
+  secondary: python
 license:
   type: apache-2.0
 security:

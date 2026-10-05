@@ -1,0 +1,2 @@
+use atc_core::TOOLCHAIN_SCHEMA;
+fn main(){let mut a=std::env::args().skip(1);match a.next().as_deref(){Some("version")=>println!("atc-toolchain {}",env!("CARGO_PKG_VERSION")),Some("toolchain") if a.next().as_deref()==Some("info")=>println!("{TOOLCHAIN_SCHEMA}"),Some("doctor")=>println!("ATC-TOOLCHAIN-DOCTOR: baseline OK"),_=>{eprintln!("usage: atc <doctor|version|toolchain info>");std::process::exit(2)}}}
