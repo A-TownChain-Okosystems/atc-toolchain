@@ -1,173 +1,140 @@
 # ATC Toolchain
 
-> **ATC COMPLIANCE: R1** — initialer Audit via governance-ci.yml (ATC-STD-201/202/203), R-Level aus `.atc/repository.yaml`.
+> Deterministic Rust-first toolchain for ATCLang, ATC-VM bytecode verification, ABI/artifacts, cross-target tooling, and exact-SHA evidence.
 
-> Proprietäre Entwicklungs-, Build- und Governance-Werkzeuge für das A-TownChain-Ökosystem. Die Toolchain bündelt CLI, Build-Orchestrierung, Codegenerierung und Audit-Runner als from-scratch Eigenentwicklung (AD-Mandat: kein POSIX-Klon, keine externen Forks).
-
-**Project:** atc-toolchain  
+**Project:** `atc-toolchain`  
 **Organization:** A-TownChain-Okosystems  
 **Status:** `development`  
 **Version:** `0.1.0`  
-**License:** `Apache-2.0 — A-TownChain-Okosystems`  
-**Standard:** `ATC-STD-README-001`  
-**Maintainer:** A-TownChain-Okosystems (ShivaCoreDev)
+**License:** `Apache-2.0`
 
-## Overview
+## Ownership and boundaries
 
-`atc-toolchain` ist die kanonische Werkzeugkette des A-TownChain-Ökosystems. Sie verbindet die verteilten Per-Repo-Werkzeuge (Validatoren, Audit-Runner, Generatoren, Sync-Utilities) hinter einer einheitlichen CLI und Build-Orchestrierung.
+| Repository | Canonical responsibility |
+|---|---|
+| `atclang` | ATCLang language/compiler source of truth |
+| `a-townchain/components/vm` | Canonical ATC-VM implementation |
+| `atc-toolchain` | Toolchain orchestration, IR/tooling, bytecode tooling, verification adapters, ABI/artifact/evidence tooling |
+| `a-townchain-ecosystem` | Integration, compliance and evidence only |
 
-Die Toolchain unterstützt die Schichten der Bauhierarchie:
+**Standalone First, Ecosystem Second.** This repository must not become a second implementation of the language or VM.
 
-- **atclang (L0):** Compiler-Treiber, Format-Checks, Gate-Runner.
-- **atc-shivacore (L1):** Kernel-Build-Orchestrierung, Spec-Gates (SC-001ff).
-- **a-townchain / Services (L3/L5):** Komponenten-Builds, Sync-Skripte, Release-Gates.
-- **atc-standards:** Audit-Runner-Integration (atc-repo-audit), Standard-Validatoren.
-
-## Purpose
-
-ATC Toolchain provides the canonical developer tooling within the A-TownChain ecosystem. It is responsible for:
-
-- Build-Orchestrierung über die Repo-Grenzen hinweg (Layer-Hierarchie).
-- Einheitliche CLI für gängige Entwicklungs- und Governance-Operationen.
-- Audit- und Validator-Runner-Integration (Registry-geprüft).
-- Codegenerierung und Scaffolding nach AD-036-Naming.
-
-## Scope
-
-- **Gilt für:** Werkzeuge, Runner, Generatoren und CLI des Ökosystems.
-- **Nicht-Gilt für:** Die Ziel-Software selbst — Sprache, Kernel, Chain und Services bleiben in ihren kanonischen Repos (Produkt-Repo-Regel AD-017).
-
-## Status
-
-**Status:** `development` — R1-Skelett. Struktur und Governance sind definiert; die Implementierung folgt den Gates der Lauffähigkeits-Roadmap.
-
-Kein Production- oder Mainnet-Claim wird allein aus README-Status abgeleitet (SCR-0080: CLAIMED != PASS).
-
-## Architecture
+## Deterministic pipeline
 
 ```text
-atc CLI (atc-tc)
-     │
-     ├── build        # Build-Orchestrierung (Layer-geprüft)
-     ├── audit        # atc-repo-audit / Standard-Validatoren
-     ├── gen          # Scaffolding / Generatoren (AD-036-Naming)
-     └── sync         # Modul-Sync (AD-017-Regelwerk)
+.atc
+  -> Lexer
+  -> Parser
+  -> AST
+  -> Semantic / Capability Analysis
+  -> ATC-IR
+  -> Optimization
+  -> Bytecode Generation
+  -> Bytecode Validation
+  -> Gas Analysis
+  -> ATC Artifact
 ```
 
-### Components
-
-- `CLI`: Einheitliche Einstiegsfläche (geplant, R1-Skelett).
-- `Audit-Runner-Integration`: Anbindung an atc-repo-audit und Standard-Validatoren.
-- `Sync-Utilities`: Modul-Sync nach AD-017-Regelwerk.
-
-### Dependencies
-
-| Component | Purpose | Required |
-|---|---|---|
-| `atc-standards` | Governance, Standards, atc-repo-audit | Yes |
-| `atclang` | L0-Ziel der Build-Orchestrierung | No |
-| `a-townchain` | Integration Sync-Ziel | No |
-
-## Features
-
-- Einheitliche CLI (geplant, R1).
-- Governance-CI ab erster Stunde (AD-039-Sweep-Lektion).
-- Registry-Anbindung an `atc-standards/registry/repositories.yaml`.
-
-## Repository Structure
+Build provenance is bound to:
 
 ```text
-.
-├── docs/                # Dokumentation und Standard-Referenz
-├── .atc/                # Repository-Metadaten + Evidence (SSOT)
-└── src/                 # Werkzeug-Quellcode (folgt)
+Source SHA
+  -> Compiler SHA
+  -> Toolchain Version
+  -> Compiler Configuration
+  -> Input Hash
+  -> Artifact Hash
 ```
 
-## Requirements
+## ATCB verification boundary
 
-- Python >= 3.11 (stdlib-first, wie atc-repo-audit)
-- Git >= 2.30
+The current verifier implements the structural ATCB-1 baseline: magic, format version, instruction count, canonical instruction framing, unknown-opcode rejection, truncation rejection, and program-op limits. The canonical ATCLang repository remains the authority for bytecode semantics; this crate is an integration/verification boundary, not a replacement VM.
 
-## Installation
+The canonical source currently exposes the ATCB header as:
 
-```bash
-git clone https://github.com/A-TownChain-Okosystems/atc-toolchain.git
+```text
+magic             = "ATCB"        4 bytes
+format_version    = u16 BE        2 bytes
+instruction_count = u32 BE        4 bytes
+instructions      = canonical opcode stream
 ```
 
-## Usage
+Any conflict between this integration layer and the canonical ATCLang/ATC-VM specification is a release blocker and must be resolved by Gate 0 before extending the implementation.
 
-R1-Skelett — CLI folgt. Governance-Audit läuft automatisch via `governance-ci.yml` bei jedem Push.
+## CLI
+
+Implemented baseline commands:
+
+```text
+atc version
+atc toolchain info
+atc doctor
+```
+
+Planned command surface:
+
+```text
+atc build
+atc check
+atc test
+atc verify
+atc lang compile|check|fmt
+atc vm assemble|disassemble|verify|analyze|gas
+atc abi generate|verify
+atc target list|build
+atc artifact inspect|hash
+atc evidence collect|verify
+```
+
+## Evidence model
+
+A successful build is not itself verification.
+
+```text
+IMPLEMENTED
+  -> EXECUTED
+  -> TESTED
+  -> EVIDENCE COLLECTED
+  -> EXACT-SHA VERIFIED
+  -> VERIFIED
+```
+
+Every verification claim must bind to an immutable commit SHA and retain run/job/step, exit code and log evidence. No green CI claim is converted into `VERIFIED` without that evidence.
 
 ## Development
 
-Entwicklung erfolgt stdlib-first (Python) mit Conventional Commits. Werkzeuge greifen nur über definierte Schnittstellen auf Ziel-Repos zu; Mutationsrechte bleiben bei den Ziel-Repos.
+Requirements:
 
-## Testing
+- Rust stable toolchain
+- Python 3.11+ for repository governance tooling
+- Git 2.30+
 
-Tests folgen mit der Implementierung; kein Test-Claim ohne Evidence-Bundle (ATC-STD-MILESTONE-001).
+Local validation:
 
-## Security
+```bash
+cargo fmt --all -- --check
+cargo check --workspace
+cargo test --workspace
+```
 
-Security issues werden gemäß ATC-STD-203 und dem offiziellen ATC-Security-Reporting-Prozess behandelt, nicht über öffentliche GitHub Issues.
+Governance and Rust validation run independently; one must not weaken or replace the other.
 
-## Documentation
+## Repository structure
 
-- `docs/REPOSITORY_STANDARD.md` — Repo-spezifischer Standard
-- `a-townchain-os-docs` — zentrale technische Dokumentation
+```text
+.
+├── crates/
+│   ├── atc-cli/
+│   ├── atc-core/
+│   ├── atc-verifier/
+│   ├── atc-artifact/
+│   └── atc-evidence/
+├── docs/
+└── .atc/
+```
 
-## Governance
+## Status
 
-Dieses Repository unterliegt `ATC-STD-000` und den jeweils geltenden A-TownChain-Standards. Standard-IDs werden ausschließlich über Registry und Governance vergeben.
+R1 deterministic foundation is implemented. Full compiler integration, complete ATC-IR, semantic/capability verification, gas analysis, ABI management, deterministic packaging, cross compilation, and the complete CLI remain open roadmap work.
 
-## Standards & Compliance
-
-| Standard | Version | Compliance |
-|---|---:|---|
-| ATC-STD-000 | 1.3.0 | ✅ |
-| ATC-STD-201 | 1.0.1 | ✅ |
-| ATC-STD-202 | 1.2.0 | ✅ |
-| ATC-STD-203 | 1.0.1 | ✅ |
-| ATC-STD-README-001 | 1.0.0 | ✅ |
-| ATC-STD-MD-001 | 1.0.0 | ✅ |
-
-## Roadmap
-
-Siehe GitHub Issues/Projects und die kanonischen Dokumentationsquellen.
-
-## Contributing
-
-Beiträge erfolgen gemäß den Governance-Regeln von `ATC-STD-000`.
-
-## License
-
-Apache-2.0 — A-TownChain-Okosystems. Siehe `LICENSE`.
-
-## Maintainers
-
-**Organization:** A-TownChain-Okosystems  
-**Maintainer:** ShivaCoreDev / Aurora Superagent
-
-## Changelog
-
-Initial: R1-Skelett (05.10.2026).
-
-## Repository Metadata
-
-<!-- atc metadata block (ATC-STD-README-001 §14) -->
-<!--
-atc:
-  standard: ATC-STD-README-001
-  version: 1.0.0
-repository:
-  id: ATC-REPO-TOOL-001
-  name: atc-toolchain
-  type: software
-  status: development
-ownership:
-  organization: A-TownChain-Okosystems
-technology:
-  primary_language: Python
-governance:
-  security_class: S2 — Developer Tools
-  criticality: C3
--->
+No production, mainnet, or full-verifier claim is made by repository status alone.
