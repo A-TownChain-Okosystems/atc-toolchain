@@ -2,7 +2,7 @@
 
 > **ATC COMPLIANCE: R1** — initialer Audit via governance-ci.yml (ATC-STD-201/202/203), R-Level aus `.atc/repository.yaml`.
 
-> Proprietäre Entwicklungs-, Build- und Governance-Werkzeuge für das A-TownChain-Ökosystem. Die Toolchain bündelt CLI, Build-Orchestrierung, Codegenerierung und Audit-Runner als from-scratch Eigenentwicklung (AD-Mandat: kein POSIX-Klon, keine externen Forks).
+> Eigenständige Entwicklungs-, Build- und Governance-Werkzeuge für das A-TownChain-Ökosystem. Die Toolchain bündelt CLI, Build-Orchestrierung, Codegenerierung und Audit-Runner als from-scratch Eigenentwicklung (AD-Mandat: kein POSIX-Klon, keine externen Forks).
 
 **Project:** atc-toolchain  
 **Organization:** A-TownChain-Okosystems  
