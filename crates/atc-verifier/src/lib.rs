@@ -16,18 +16,20 @@ pub enum VerificationError {
 }
 
 fn read_u16_be(bytes: &[u8], offset: usize) -> Option<u16> {
-    bytes.get(offset..offset + 2).map(|v| u16::from_be_bytes([v[0], v[1]]))
+    bytes
+        .get(offset..offset + 2)
+        .map(|v| u16::from_be_bytes([v[0], v[1]]))
 }
 
 fn instruction_width(opcode: u8) -> Option<usize> {
     match opcode {
-        0x01 => Some(9),  // ConstI64
+        0x01 => Some(9),        // ConstI64
         0x02 | 0x03 => Some(3), // LoadLocal / StoreLocal
         0x10..=0x1A => Some(1), // arithmetic/comparison
-        0x20 => Some(5),  // Call
-        0x21 => Some(1),  // canonical Return
+        0x20 => Some(5),        // Call
+        0x21 => Some(1),        // canonical Return
         0x30 | 0x31 => Some(3), // Jump / JumpIfFalse
-        0x40 => Some(1),  // Pop
+        0x40 => Some(1),        // Pop
         _ => None,
     }
 }
@@ -37,7 +39,9 @@ fn instruction_width(opcode: u8) -> Option<usize> {
 /// the canonical VM/compiler implementations.
 pub fn verify(bytecode: &[u8], limits: Limits) -> Result<(), VerificationError> {
     if bytecode.len() < HEADER_LEN {
-        return Err(VerificationError::HeaderTooShort { actual: bytecode.len() });
+        return Err(VerificationError::HeaderTooShort {
+            actual: bytecode.len(),
+        });
     }
     if bytecode[..4] != BYTECODE_MAGIC {
         return Err(VerificationError::InvalidMagic);
@@ -48,9 +52,7 @@ pub fn verify(bytecode: &[u8], limits: Limits) -> Result<(), VerificationError> 
         return Err(VerificationError::UnsupportedVersion { actual: version });
     }
 
-    let declared = u32::from_be_bytes(
-        bytecode[6..10].try_into().expect("header length checked"),
-    );
+    let declared = u32::from_be_bytes(bytecode[6..10].try_into().expect("header length checked"));
     if declared > limits.max_program_ops {
         return Err(VerificationError::ProgramOpsExceeded {
             actual: declared,
@@ -67,8 +69,8 @@ pub fn verify(bytecode: &[u8], limits: Limits) -> Result<(), VerificationError> 
         let opcode = *bytecode
             .get(offset)
             .ok_or(VerificationError::TruncatedInstruction { pc, opcode: 0 })?;
-        let width = instruction_width(opcode)
-            .ok_or(VerificationError::UnknownOpcode { pc, opcode })?;
+        let width =
+            instruction_width(opcode).ok_or(VerificationError::UnknownOpcode { pc, opcode })?;
         if offset + width > bytecode.len() {
             return Err(VerificationError::TruncatedInstruction { pc, opcode });
         }
@@ -110,7 +112,10 @@ mod tests {
     fn rejects_invalid_magic() {
         let mut bc = header(1, 0);
         bc[..4].copy_from_slice(b"NOPE");
-        assert_eq!(verify(&bc, Limits::default()), Err(VerificationError::InvalidMagic));
+        assert_eq!(
+            verify(&bc, Limits::default()),
+            Err(VerificationError::InvalidMagic)
+        );
     }
 
     #[test]
@@ -128,7 +133,10 @@ mod tests {
         bc.push(0xff);
         assert_eq!(
             verify(&bc, Limits::default()),
-            Err(VerificationError::UnknownOpcode { pc: 0, opcode: 0xff })
+            Err(VerificationError::UnknownOpcode {
+                pc: 0,
+                opcode: 0xff
+            })
         );
     }
 
@@ -139,7 +147,10 @@ mod tests {
         bc.extend_from_slice(&[0; 4]);
         assert!(matches!(
             verify(&bc, Limits::default()),
-            Err(VerificationError::TruncatedInstruction { pc: 0, opcode: 0x01 })
+            Err(VerificationError::TruncatedInstruction {
+                pc: 0,
+                opcode: 0x01
+            })
         ));
     }
 
@@ -157,10 +168,16 @@ mod tests {
     #[test]
     fn enforces_program_op_limit() {
         let bc = header(1, 2);
-        let limits = Limits { max_program_ops: 1, ..Limits::default() };
+        let limits = Limits {
+            max_program_ops: 1,
+            ..Limits::default()
+        };
         assert!(matches!(
             verify(&bc, limits),
-            Err(VerificationError::ProgramOpsExceeded { actual: 2, limit: 1 })
+            Err(VerificationError::ProgramOpsExceeded {
+                actual: 2,
+                limit: 1
+            })
         ));
     }
 }

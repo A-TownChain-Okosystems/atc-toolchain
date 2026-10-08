@@ -8,6 +8,10 @@
 **Version:** `0.1.0`  
 **License:** `Apache-2.0`
 
+## Purpose and Scope
+
+`atc-toolchain` provides the deterministic execution, verification, and artifact management tooling for the A-TownChain ecosystem. Its primary purpose is to establish exact-SHA build provenance, bytecode verification adapters, and standardized evidence collection for compiler and VM artifacts.
+
 ## Ownership and boundaries
 
 | Repository | Canonical responsibility |
@@ -19,7 +23,9 @@
 
 **Standalone First, Ecosystem Second.** This repository must not become a second implementation of the language or VM.
 
-## Deterministic pipeline
+## Architecture
+
+The toolchain architecture consists of modular Components, deterministic data flow pipelines, and verification boundaries:
 
 ```text
 .atc
@@ -86,6 +92,15 @@ atc artifact inspect|hash
 atc evidence collect|verify
 ```
 
+## Usage
+
+Example commands to use the toolchain CLI and verifier:
+
+```bash
+atc version
+atc doctor
+```
+
 ## Evidence model
 
 A successful build is not itself verification.
@@ -101,15 +116,25 @@ IMPLEMENTED
 
 Every verification claim must bind to an immutable commit SHA and retain run/job/step, exit code and log evidence. No green CI claim is converted into `VERIFIED` without that evidence.
 
-## Development
-
-Requirements:
+## Requirements
 
 - Rust stable toolchain
 - Python 3.11+ for repository governance tooling
 - Git 2.30+
 
-Local validation:
+## Installation
+
+To clone and build `atc-toolchain`:
+
+```bash
+git clone https://github.com/A-TownChain-Okosystems/atc-toolchain.git
+cd atc-toolchain
+cargo build --workspace
+```
+
+## Development
+
+Local validation commands:
 
 ```bash
 cargo fmt --all -- --check
@@ -119,22 +144,61 @@ cargo test --workspace
 
 Governance and Rust validation run independently; one must not weaken or replace the other.
 
-## Repository structure
+## Testing
+
+Run workspace tests:
+
+```bash
+cargo test --workspace
+```
+
+Expected result: PASS (all unit and integration tests passing).
+
+## Repository Structure
 
 ```text
 .
-├── crates/
-│   ├── atc-cli/
-│   ├── atc-core/
-│   ├── atc-verifier/
-│   ├── atc-artifact/
-│   └── atc-evidence/
-├── docs/
-└── .atc/
+├── crates
+│   ├── atc-cli
+│   ├── atc-core
+│   ├── atc-verifier
+│   ├── atc-artifact
+│   └── atc-evidence
+├── docs
+├── tests
+└── .atc
 ```
+
+## Standards & Compliance
+
+| Standard | Title | Status |
+|---|---|---|
+| `ATC-STD-201` | Repository Structure Standard | Compliant |
+| `ATC-STD-202` | Naming & Classification Standard | Compliant |
+| `ATC-STD-203` | Security & Branching Standard | Compliant |
+
+## Security
+
+Vulnerabilities must not be disclosed publicly. Follow official ATC security reporting procedures under `ATC-STD-203`.
+
+## Roadmap
+
+Roadmap and release milestones are tracked in `ROADMAP.md` and canonical GitHub Issues.
+
+## Governance
+
+Repository governance follows the A-TownChain ecosystem standards.
+
+## Maintainers
+
+Maintained by ShivaCoreDev and the A-TownChain core engineering team.
 
 ## Status
 
 R1 deterministic foundation is implemented. Full compiler integration, complete ATC-IR, semantic/capability verification, gas analysis, ABI management, deterministic packaging, cross compilation, and the complete CLI remain open roadmap work.
 
 No production, mainnet, or full-verifier claim is made by repository status alone.
+
+## License
+
+Licensed under the Apache License, Version 2.0 (`Apache-2.0`).
