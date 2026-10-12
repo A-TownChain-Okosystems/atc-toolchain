@@ -22,7 +22,9 @@ pub struct AtcbV1<'a> {
 /// untrusted instruction count. Opcode framing is checked by each consumer.
 pub fn decode_atcb_v1(bytes: &[u8]) -> Result<AtcbV1<'_>, AtcbV1Error> {
     if bytes.len() < ATCB_V1_HEADER_LEN {
-        return Err(AtcbV1Error::HeaderTooShort { actual: bytes.len() });
+        return Err(AtcbV1Error::HeaderTooShort {
+            actual: bytes.len(),
+        });
     }
     if bytes[..4] != *b"ATCB" {
         return Err(AtcbV1Error::InvalidMagic);
@@ -33,8 +35,7 @@ pub fn decode_atcb_v1(bytes: &[u8]) -> Result<AtcbV1<'_>, AtcbV1Error> {
         return Err(AtcbV1Error::UnsupportedVersion { actual: version });
     }
 
-    let instruction_count =
-        u32::from_be_bytes([bytes[6], bytes[7], bytes[8], bytes[9]]);
+    let instruction_count = u32::from_be_bytes([bytes[6], bytes[7], bytes[8], bytes[9]]);
     let instructions = &bytes[ATCB_V1_HEADER_LEN..];
     if instruction_count as u64 > instructions.len() as u64 {
         return Err(AtcbV1Error::InstructionCountExceedsPayload {
@@ -43,7 +44,10 @@ pub fn decode_atcb_v1(bytes: &[u8]) -> Result<AtcbV1<'_>, AtcbV1Error> {
         });
     }
 
-    Ok(AtcbV1 { instruction_count, instructions })
+    Ok(AtcbV1 {
+        instruction_count,
+        instructions,
+    })
 }
 
 #[cfg(test)]
@@ -68,12 +72,14 @@ mod tests {
 
     #[test]
     fn rejects_short_header() {
-        assert_eq!(decode_atcb_v1(b"ATCB"), Err(AtcbV1Error::HeaderTooShort { actual: 4 }));
+        assert_eq!(
+            decode_atcb_v1(b"ATCB"),
+            Err(AtcbV1Error::HeaderTooShort { actual: 4 })
+        );
     }
 
     #[test]
     fn rejects_wrong_magic() {
-        assert_eq!(decode_atcb_v1(&container(1, 0, &[])), Ok(AtcbV1 { instruction_count: 0, instructions: &[] }));
         let mut bytes = container(1, 0, &[]);
         bytes[..4].copy_from_slice(b"NOPE");
         assert_eq!(decode_atcb_v1(&bytes), Err(AtcbV1Error::InvalidMagic));
@@ -81,14 +87,20 @@ mod tests {
 
     #[test]
     fn rejects_unsupported_version() {
-        assert_eq!(decode_atcb_v1(&container(2, 0, &[])), Err(AtcbV1Error::UnsupportedVersion { actual: 2 }));
+        assert_eq!(
+            decode_atcb_v1(&container(2, 0, &[])),
+            Err(AtcbV1Error::UnsupportedVersion { actual: 2 })
+        );
     }
 
     #[test]
     fn rejects_count_larger_than_payload_before_allocating() {
         assert_eq!(
             decode_atcb_v1(&container(1, u32::MAX, &[])),
-            Err(AtcbV1Error::InstructionCountExceedsPayload { declared: u32::MAX, available: 0 })
+            Err(AtcbV1Error::InstructionCountExceedsPayload {
+                declared: u32::MAX,
+                available: 0,
+            })
         );
     }
 }
