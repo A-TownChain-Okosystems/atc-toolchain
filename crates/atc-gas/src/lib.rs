@@ -26,7 +26,7 @@ pub enum GasError {
 impl GasPolicy {
     pub fn analyze(self, bc: &[u8]) -> Result<GasReport, GasError> {
         let mut o = 0;
-        let (mut ops, mut total) = (0, 0);
+        let (mut ops, mut total): (u64, u64) = (0, 0);
         while o < bc.len() {
             let op = bc[o];
             let (w, c) = match op {
@@ -37,7 +37,7 @@ impl GasPolicy {
                 0x21 => (1, self.return_cost),
                 0x30 | 0x31 => (3, self.control_flow),
                 0x40 => (1, self.pop_cost),
-                _ => (return Err(GasError::UnknownOpcode(op))),
+                _ => return Err(GasError::UnknownOpcode(op)),
             };
             if o + w > bc.len() {
                 return Err(GasError::TruncatedInstruction(op));
