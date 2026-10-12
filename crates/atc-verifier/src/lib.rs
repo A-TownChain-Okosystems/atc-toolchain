@@ -33,9 +33,13 @@ fn map_header_error(error: AtcbV1Error) -> VerificationError {
         AtcbV1Error::UnsupportedVersion { actual } => {
             VerificationError::UnsupportedVersion { actual }
         }
-        AtcbV1Error::InstructionCountExceedsPayload { declared, available } => {
-            VerificationError::InstructionCountExceedsPayload { declared, available }
-        }
+        AtcbV1Error::InstructionCountExceedsPayload {
+            declared,
+            available,
+        } => VerificationError::InstructionCountExceedsPayload {
+            declared,
+            available,
+        },
     }
 }
 
