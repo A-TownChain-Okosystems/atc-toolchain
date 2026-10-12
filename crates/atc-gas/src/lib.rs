@@ -26,7 +26,7 @@ pub enum GasError {
     InvalidContainer(AtcbV1Error),
     UnknownOpcode(u8),
     TruncatedInstruction(u8),
-    InstructionCountMismatch { declared: u32, parsed: u32 },
+    TrailingBytes { declared: u32, remaining: usize },
     Overflow,
     LimitExceeded { total: u64, limit: u64 },
 }
@@ -69,9 +69,9 @@ impl GasPolicy {
         }
 
         if offset != instructions.len() {
-            return Err(GasError::InstructionCountMismatch {
+            return Err(GasError::TrailingBytes {
                 declared,
-                parsed: declared,
+                remaining: instructions.len() - offset,
             });
         }
         Ok(GasReport {
@@ -165,9 +165,9 @@ mod tests {
     fn rejects_trailing_bytes() {
         assert_eq!(
             policy().analyze(&container(1, &[0x21, 0x21])),
-            Err(GasError::InstructionCountMismatch {
+            Err(GasError::TrailingBytes {
                 declared: 1,
-                parsed: 1,
+                remaining: 1,
             })
         );
     }
