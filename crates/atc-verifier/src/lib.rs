@@ -61,8 +61,8 @@ pub fn verify(bytecode: &[u8], limits: Limits) -> Result<(), VerificationError> 
         let opcode = *instructions
             .get(offset)
             .ok_or(VerificationError::TruncatedInstruction { pc, opcode: 0 })?;
-        let width = instruction_width(opcode)
-            .ok_or(VerificationError::UnknownOpcode { pc, opcode })?;
+        let width =
+            instruction_width(opcode).ok_or(VerificationError::UnknownOpcode { pc, opcode })?;
         if offset + width > instructions.len() {
             return Err(VerificationError::TruncatedInstruction { pc, opcode });
         }
