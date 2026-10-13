@@ -1,3 +1,6 @@
+pub mod atcb;
+pub use atcb::{decode_atcb_v1, AtcbV1, AtcbV1Error, ATCB_V1_FORMAT_VERSION, ATCB_V1_HEADER_LEN};
+
 pub const TOOLCHAIN_SCHEMA: &str = "ATC-TOOLCHAIN-1";
 pub const BYTECODE_MAGIC: [u8; 4] = *b"ATCB";
 

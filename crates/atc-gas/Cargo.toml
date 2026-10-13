@@ -1,7 +1,9 @@
 [package]
-name="atc-gas"
-version.workspace=true
-edition.workspace=true
-license.workspace=true
+name = "atc-gas"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 [lib]
-path="src/lib.rs"
+path = "src/lib.rs"
+[dependencies]
+atc-core = { path = "../atc-core" }
